@@ -613,6 +613,44 @@ class SeriesServiceImplTest extends Specification {
 			})
 	}
 	
+	def "addImageToSeries() should remove image when cannot add to series"() {
+		given:
+			Integer expectedImageId = ANY_IMAGE_ID
+		and:
+			// FIXME: why we can't use _ as Integer here?
+			imageService.addToSeries(_, _) >> {
+				throw new RuntimeException('Ooops')
+			}
+		when:
+			service.addImageToSeries(imageForm, 11, 1)
+		then:
+			1 * imageService.remove({ Integer imageId ->
+				assert imageId == expectedImageId
+				return true
+			})
+		and:
+			thrown RuntimeException
+	}
+	
+	def "addImageToSeries() should remove image when cannot mark as modified"() {
+		given:
+			Integer expectedImageId = ANY_IMAGE_ID
+		and:
+			// FIXME: why we can't use _ as Integer here?
+			seriesDao.markAsModified(_, _, _) >> {
+				throw new RuntimeException('Ooops')
+			}
+		when:
+			service.addImageToSeries(imageForm, 12, 2)
+		then:
+			1 * imageService.remove({ Integer imageId ->
+				assert imageId == expectedImageId
+				return true
+			})
+		and:
+			thrown RuntimeException
+	}
+	
 	//
 	// Tests for countAll()
 	//

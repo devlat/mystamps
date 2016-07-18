@@ -168,8 +168,15 @@ public class SeriesServiceImpl implements SeriesService {
 		Validate.isTrue(userId != null, "User id must be non null");
 		
 		Integer imageId = imageService.save(dto.getImage());
-		imageService.addToSeries(seriesId, imageId);
-		seriesDao.markAsModified(seriesId, new Date(), userId);
+		
+		try {
+			imageService.addToSeries(seriesId, imageId);
+			seriesDao.markAsModified(seriesId, new Date(), userId);
+			
+		} catch (RuntimeException ex) { // NOPMD: AvoidCatchingGenericException
+			imageService.remove(imageId);
+			throw ex;
+		}
 		
 		LOG.info(
 			"Image #{} was added to series #{} by user #{}",
