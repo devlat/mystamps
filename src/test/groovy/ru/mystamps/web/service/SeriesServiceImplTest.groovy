@@ -570,6 +570,25 @@ class SeriesServiceImplTest extends Specification {
 			})
 	}
 	
+	def "add() should remove image when exception happens"() {
+		given:
+			Integer expectedImageId = ANY_IMAGE_ID
+		and:
+			// FIXME: why we can't use _ as Integer here?
+			imageService.addToSeries(_, _) >> {
+				throw new RuntimeException('Ooops')
+			}
+		when:
+			service.add(form, 117, false)
+		then:
+			1 * imageService.remove({ Integer imageId ->
+				assert imageId == expectedImageId
+				return true
+			})
+		and:
+			thrown RuntimeException
+	}
+	
 	//
 	// Tests for addImageToSeries()
 	//

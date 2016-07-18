@@ -91,6 +91,11 @@ public class FilesystemImagePersistenceStrategy implements ImagePersistenceStrat
 		}
 	}
 	
+	@Override
+	public void remove(Integer imageId) {
+		// TODO
+	}
+	
 	// protected to allow spying
 	protected Path createFile(ImageInfoDto image) {
 		return new File(storageDir, generateFileName(image)).toPath();

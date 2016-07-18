@@ -214,6 +214,22 @@ class ImageServiceImplTest extends Specification {
 	}
 	
 	//
+	// Tests for remove()
+	//
+	
+	def "remove() should invoke dao and pass argument"() {
+		given:
+			Integer expectedImageId = 92
+		when:
+			service.remove(expectedImageId)
+		then:
+			1 * imagePersistenceStrategy.remove({ Integer imageId ->
+				assert imageId == expectedImageId
+				return true
+			})
+	}
+	
+	//
 	// Tests for addToSeries()
 	//
 	

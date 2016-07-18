@@ -149,7 +149,13 @@ public class SeriesServiceImpl implements SeriesService {
 		}
 		
 		Integer imageId = imageService.save(dto.getImage());
-		imageService.addToSeries(id, imageId);
+		
+		try {
+			imageService.addToSeries(id, imageId);
+		} catch (RuntimeException ex) { // NOPMD: AvoidCatchingGenericException
+			imageService.remove(imageId);
+			throw ex;
+		}
 		
 		return id;
 	}

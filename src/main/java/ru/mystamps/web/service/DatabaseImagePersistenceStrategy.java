@@ -74,4 +74,9 @@ public class DatabaseImagePersistenceStrategy implements ImagePersistenceStrateg
 		return imageDto;
 	}
 	
+	@Override
+	public void remove(Integer imageId) {
+		// TODO
+	}
+	
 }

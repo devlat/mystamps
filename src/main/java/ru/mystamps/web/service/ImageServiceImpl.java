@@ -94,6 +94,11 @@ public class ImageServiceImpl implements ImageService {
 	}
 	
 	@Override
+	public void remove(Integer imageId) {
+		imagePersistenceStrategy.remove(imageId);
+	}
+	
+	@Override
 	@Transactional
 	@PreAuthorize(HasAuthority.CREATE_SERIES)
 	public void addToSeries(Integer seriesId, Integer imageId) {
