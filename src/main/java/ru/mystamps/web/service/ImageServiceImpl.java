@@ -50,7 +50,7 @@ public class ImageServiceImpl implements ImageService {
 	
 	@Override
 	@Transactional
-	public Integer save(MultipartFile file) {
+	public ImageInfoDto save(MultipartFile file) {
 		Validate.isTrue(file != null, "File must be non null");
 		Validate.isTrue(file.getSize() > 0, "Image size must be greater than zero");
 		
@@ -76,7 +76,7 @@ public class ImageServiceImpl implements ImageService {
 		
 		imagePersistenceStrategy.save(file, image);
 		
-		return image.getId();
+		return image;
 	}
 	
 	@Override
@@ -94,8 +94,8 @@ public class ImageServiceImpl implements ImageService {
 	}
 	
 	@Override
-	public void remove(Integer imageId) {
-		imagePersistenceStrategy.remove(imageId);
+	public void remove(ImageInfoDto image) {
+		imagePersistenceStrategy.remove(image);
 	}
 	
 	@Override

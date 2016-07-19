@@ -25,5 +25,5 @@ import ru.mystamps.web.dao.dto.ImageInfoDto;
 public interface ImagePersistenceStrategy {
 	void save(MultipartFile file, ImageInfoDto image);
 	ImageDto get(ImageInfoDto image);
-	void remove(Integer imageId);
+	void remove(ImageInfoDto image);
 }

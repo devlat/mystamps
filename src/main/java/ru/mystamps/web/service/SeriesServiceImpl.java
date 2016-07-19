@@ -35,6 +35,7 @@ import lombok.RequiredArgsConstructor;
 
 import ru.mystamps.web.dao.SeriesDao;
 import ru.mystamps.web.dao.dto.AddSeriesDbDto;
+import ru.mystamps.web.dao.dto.ImageInfoDto;
 import ru.mystamps.web.dao.dto.SeriesFullInfoDto;
 import ru.mystamps.web.dao.dto.SeriesInfoDto;
 import ru.mystamps.web.dao.dto.SitemapInfoDto;
@@ -148,12 +149,12 @@ public class SeriesServiceImpl implements SeriesService {
 			gibbonsCatalogService.addToSeries(id, gibbonsNumbers);
 		}
 		
-		Integer imageId = imageService.save(dto.getImage());
+		ImageInfoDto image = imageService.save(dto.getImage());
 		
 		try {
-			imageService.addToSeries(id, imageId);
+			imageService.addToSeries(id, image.getId());
 		} catch (RuntimeException ex) { // NOPMD: AvoidCatchingGenericException
-			imageService.remove(imageId);
+			imageService.remove(image);
 			throw ex;
 		}
 		
@@ -167,20 +168,20 @@ public class SeriesServiceImpl implements SeriesService {
 		Validate.isTrue(seriesId != null, "Series id must be non null");
 		Validate.isTrue(userId != null, "User id must be non null");
 		
-		Integer imageId = imageService.save(dto.getImage());
+		ImageInfoDto image = imageService.save(dto.getImage());
 		
 		try {
-			imageService.addToSeries(seriesId, imageId);
+			imageService.addToSeries(seriesId, image.getId());
 			seriesDao.markAsModified(seriesId, new Date(), userId);
 			
 		} catch (RuntimeException ex) { // NOPMD: AvoidCatchingGenericException
-			imageService.remove(imageId);
+			imageService.remove(image);
 			throw ex;
 		}
 		
 		LOG.info(
 			"Image #{} was added to series #{} by user #{}",
-			imageId,
+			image.getId(),
 			seriesId,
 			userId
 		);

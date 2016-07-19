@@ -20,6 +20,7 @@ package ru.mystamps.web.service;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 
 import javax.annotation.PostConstruct;
@@ -92,8 +93,16 @@ public class FilesystemImagePersistenceStrategy implements ImagePersistenceStrat
 	}
 	
 	@Override
-	public void remove(Integer imageId) {
-		// TODO
+	public void remove(ImageInfoDto image) {
+		Path file = createFile(image);
+		try {
+			Files.delete(file);
+		} catch (NoSuchFileException ignored) { // NOPMD: EmptyCatchBlock
+			// Intentionally empty
+			
+		} catch (RuntimeException | IOException ex) { // NOPMD: AvoidCatchingGenericException
+			throw new ImagePersistenceException(ex);
+		}
 	}
 	
 	// protected to allow spying
