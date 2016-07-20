@@ -136,13 +136,13 @@ class ImageServiceImplTest extends Specification {
 	
 	def "save() should return saved image"() {
 		given:
-			Integer expectedImageId = 20
+			ImageInfoDto expectedImage = TestObjects.createImageInfoDto()
 		when:
-			Integer actualImageId = service.save(multipartFile)
+			ImageInfoDto actualImage = service.save(multipartFile)
 		then:
-			imageDao.add(_ as String) >> expectedImageId
+			imageDao.add(_ as String) >> expectedImage.id
 		and:
-			actualImageId == expectedImageId
+			actualImage == expectedImage
 	}
 	
 	//
@@ -219,12 +219,12 @@ class ImageServiceImplTest extends Specification {
 	
 	def "remove() should invoke dao and pass argument"() {
 		given:
-			Integer expectedImageId = 92
+			ImageInfoDto expectedImage = TestObjects.createImageInfoDto()
 		when:
-			service.remove(expectedImageId)
+			service.remove(expectedImage)
 		then:
-			1 * imagePersistenceStrategy.remove({ Integer imageId ->
-				assert imageId == expectedImageId
+			1 * imagePersistenceStrategy.remove({ ImageInfoDto image ->
+				assert image == expectedImage
 				return true
 			})
 	}
