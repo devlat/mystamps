@@ -17,9 +17,15 @@
  */
 package ru.mystamps.web.dao.dto;
 
-import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 
-@Data
+@EqualsAndHashCode
+@Getter
+@RequiredArgsConstructor
+@ToString
 public class ImageInfoDto {
 	private final Integer id;
 	private final String type;
