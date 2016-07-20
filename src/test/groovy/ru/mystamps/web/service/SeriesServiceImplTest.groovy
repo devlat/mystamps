@@ -24,6 +24,7 @@ import spock.lang.Unroll
 
 import ru.mystamps.web.dao.SeriesDao
 import ru.mystamps.web.dao.dto.AddSeriesDbDto
+import ru.mystamps.web.dao.dto.ImageInfoDto
 import ru.mystamps.web.model.AddImageForm
 import ru.mystamps.web.model.AddSeriesForm
 import ru.mystamps.web.dao.dto.LinkEntityDto
@@ -34,7 +35,6 @@ import ru.mystamps.web.tests.DateUtils
 
 class SeriesServiceImplTest extends Specification {
 	private static final BigDecimal ANY_PRICE = new BigDecimal("17")
-	private static final Integer ANY_IMAGE_ID = 18
 	
 	private ImageService imageService = Mock()
 	private SeriesDao seriesDao = Mock()
@@ -59,7 +59,7 @@ class SeriesServiceImplTest extends Specification {
 		
 		userId = TestObjects.TEST_USER_ID
 		
-		imageService.save(_) >> ANY_IMAGE_ID
+		imageService.save(_) >> TestObjects.createImageInfoDto()
 		
 		service = new SeriesServiceImpl(
 			seriesDao,
@@ -545,7 +545,7 @@ class SeriesServiceImplTest extends Specification {
 			1 * imageService.save({ MultipartFile passedFile ->
 				assert passedFile == multipartFile
 				return true
-			}) >> ANY_IMAGE_ID
+			}) >> TestObjects.createImageInfoDto()
 	}
 	
 	def "add() should add image to the series"() {
@@ -554,12 +554,14 @@ class SeriesServiceImplTest extends Specification {
 		and:
 			seriesDao.add(_ as AddSeriesDbDto) >> expectedSeriesId
 		and:
-			Integer expectedImageId = 456
+			ImageInfoDto expectedImage = TestObjects.createImageInfoDto()
+		and:
+			Integer expectedImageId = expectedImage.id
 		when:
 			service.add(form, userId, false)
 		then:
 			// FIXME: why we can't use _ as MultipartFile here?
-			imageService.save(_) >> expectedImageId
+			imageService.save(_) >> expectedImage
 		and:
 			1 * imageService.addToSeries({ Integer seriesId ->
 				assert seriesId == expectedSeriesId
@@ -572,7 +574,7 @@ class SeriesServiceImplTest extends Specification {
 	
 	def "add() should remove image when exception happens"() {
 		given:
-			Integer expectedImageId = ANY_IMAGE_ID
+			ImageInfoDto expectedImage = TestObjects.createImageInfoDto()
 		and:
 			// FIXME: why we can't use _ as Integer here?
 			imageService.addToSeries(_, _) >> {
@@ -581,8 +583,8 @@ class SeriesServiceImplTest extends Specification {
 		when:
 			service.add(form, 117, false)
 		then:
-			1 * imageService.remove({ Integer imageId ->
-				assert imageId == expectedImageId
+			1 * imageService.remove({ ImageInfoDto image ->
+				assert image == expectedImage
 				return true
 			})
 		and:
@@ -615,7 +617,7 @@ class SeriesServiceImplTest extends Specification {
 	
 	def "addImageToSeries() should remove image when cannot add to series"() {
 		given:
-			Integer expectedImageId = ANY_IMAGE_ID
+			ImageInfoDto expectedImage = TestObjects.createImageInfoDto()
 		and:
 			// FIXME: why we can't use _ as Integer here?
 			imageService.addToSeries(_, _) >> {
@@ -624,8 +626,8 @@ class SeriesServiceImplTest extends Specification {
 		when:
 			service.addImageToSeries(imageForm, 11, 1)
 		then:
-			1 * imageService.remove({ Integer imageId ->
-				assert imageId == expectedImageId
+			1 * imageService.remove({ ImageInfoDto image ->
+				assert image == expectedImage
 				return true
 			})
 		and:
@@ -634,7 +636,7 @@ class SeriesServiceImplTest extends Specification {
 	
 	def "addImageToSeries() should remove image when cannot mark as modified"() {
 		given:
-			Integer expectedImageId = ANY_IMAGE_ID
+			ImageInfoDto expectedImage = TestObjects.createImageInfoDto()
 		and:
 			// FIXME: why we can't use _ as Integer here?
 			seriesDao.markAsModified(_, _, _) >> {
@@ -643,8 +645,8 @@ class SeriesServiceImplTest extends Specification {
 		when:
 			service.addImageToSeries(imageForm, 12, 2)
 		then:
-			1 * imageService.remove({ Integer imageId ->
-				assert imageId == expectedImageId
+			1 * imageService.remove({ ImageInfoDto image ->
+				assert image == expectedImage
 				return true
 			})
 		and:
