@@ -147,7 +147,7 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
 			// TODO: use Url
 			// TODO: use .addPathPatterns() or .pathMatcher()
 			if ("POST".equals(request.getMethod()) && "/series/add".equals(request.getRequestURI())) {
-				System.out.println("DEBUG: preHandle date: " + java.util.Date());
+				System.out.println("DEBUG: preHandle date: " + new java.util.Date());
 				System.out.println("DEBUG: preHandle params: " + request.getParameterMap());
 				System.out.println("DEBUG: preHandle image = " + request.getParameter("image"));
 				System.out.println("DEBUG: preHandle imageUrl = " + request.getParameter("imageUrl"));
