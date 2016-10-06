@@ -24,8 +24,8 @@ import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 // TODO: read http://docs.spring.io/spring/docs/current/javadoc-api/org/springframework/web/servlet/HandlerInterceptor.html
 // TODO: read http://docs.spring.io/spring/docs/current/javadoc-api/org/springframework/web/context/request/WebRequestInterceptor.html
-// TODO: extract
-public class DownloadImageFromExternalResourceInterceptor extends HandlerInterceptorAdapter {
+// TODO: javadoc
+public class DownloadImageInterceptor extends HandlerInterceptorAdapter {
 	
 	@Override
 	@SuppressWarnings("PMD.SignatureDeclareThrowsException")

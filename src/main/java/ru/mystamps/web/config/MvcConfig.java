@@ -43,7 +43,7 @@ import lombok.RequiredArgsConstructor;
 
 import ru.mystamps.web.Url;
 import ru.mystamps.web.controller.converter.LinkEntityDtoGenericConverter;
-import ru.mystamps.web.controller.interceptor.DownloadImageFromExternalResourceInterceptor;
+import ru.mystamps.web.controller.interceptor.DownloadImageInterceptor;
 import ru.mystamps.web.support.spring.security.CurrentUserArgumentResolver;
 
 @Configuration
@@ -118,7 +118,7 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
 		registry.addInterceptor(interceptor);
 		
 		// TODO: check add series with category/country
-		registry.addInterceptor(new DownloadImageFromExternalResourceInterceptor())
+		registry.addInterceptor(new DownloadImageInterceptor())
 			.addPathPatterns(Url.ADD_SERIES_PAGE);
 	}
 	
