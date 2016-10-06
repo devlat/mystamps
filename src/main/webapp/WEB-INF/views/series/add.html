@@ -229,6 +229,18 @@
 							</div>
 						</div>
 						
+						<div class="form-group form-group-sm" th:classappend="${#fields.hasErrors('imageUrl') ? 'has-error' : ''}">
+							<label for="image-url" class="control-label col-sm-3">
+								<span class="field-label" th:text="#{t_image_url}">
+									Image URL
+								</span>
+							</label>
+							<div class="col-sm-7">
+								<input type="url" id="image-url" th:field="*{imageUrl}" />
+								<span id="image-url.errors" class="help-block" th:if="${#fields.hasErrors('imageUrl')}" th:each="error : ${#fields.errors('imageUrl')}" th:text="${error}"></span>
+							</div>
+						</div>
+						
 						<div class="form-group js-collapse-toggle-header">
 							<div class="col-sm-offset-3 col-sm-5">
 								<span class="glyphicon glyphicon-chevron-right" th:class="${issueDateHasErrors or issueDateHasValues ? 'glyphicon glyphicon-chevron-down' : 'glyphicon glyphicon-chevron-right'}"></span>&nbsp;<a href="javascript:void(0)" id="specify-issue-date-link" data-toggle="collapse" data-target=".js-issue-date" th:text="#{t_specify_issue_date}">

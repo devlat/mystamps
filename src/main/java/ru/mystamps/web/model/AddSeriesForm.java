@@ -135,6 +135,7 @@ public class AddSeriesForm implements AddSeriesDto {
 	@ImageFile(groups = Image3Checks.class)
 	private MultipartFile image;
 	
+	private String imageUrl;
 	
 	@GroupSequence({
 		ReleaseDate1Checks.class,

@@ -169,6 +169,7 @@ public class SeriesController {
 		BindingResult result,
 		@CurrentUser Integer currentUserId) {
 		
+		System.out.println("DEBUG: controller: " + new java.util.Date());
 		if (result.hasErrors()) {
 			// don't try to re-display file upload field
 			form.setImage(null);

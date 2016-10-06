@@ -20,6 +20,9 @@ package ru.mystamps.web.config;
 import java.util.List;
 import java.util.Locale;
 
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -38,6 +41,7 @@ import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 import org.springframework.web.servlet.i18n.SessionLocaleResolver;
+import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 import lombok.RequiredArgsConstructor;
 
@@ -115,6 +119,7 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
 		interceptor.setParamName("lang");
 		
 		registry.addInterceptor(interceptor);
+		registry.addInterceptor(new DownloadImageFromExternalResourceInterceptor());
 	}
 	
 	@Override
@@ -130,6 +135,33 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
 		SessionLocaleResolver resolver = new SessionLocaleResolver();
 		resolver.setDefaultLocale(Locale.ENGLISH);
 		return resolver;
+	}
+	
+	// TODO: read http://docs.spring.io/spring/docs/current/javadoc-api/org/springframework/web/servlet/HandlerInterceptor.html
+	// TODO: read http://docs.spring.io/spring/docs/current/javadoc-api/org/springframework/web/context/request/WebRequestInterceptor.html
+	// TODO: extract
+	public class DownloadImageFromExternalResourceInterceptor extends HandlerInterceptorAdapter {
+		
+		@Override
+		public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+			// TODO: use Url
+			// TODO: use .addPathPatterns() or .pathMatcher()
+			if ("POST".equals(request.getMethod()) && "/series/add".equals(request.getRequestURI())) {
+				System.out.println("DEBUG: preHandle date: " + java.util.Date());
+				System.out.println("DEBUG: preHandle params: " + request.getParameterMap());
+				System.out.println("DEBUG: preHandle image = " + request.getParameter("image"));
+				System.out.println("DEBUG: preHandle imageUrl = " + request.getParameter("imageUrl"));
+				
+				// TODO: find attachment
+				// TODO: if attachment is empty and url is not empty => download image and fill attach
+				// TODO: if attachment is not empty and url is not empty => do nothing (validator will fail later)
+				// TODO: how we can validate url?
+				// TODO: where/how to show possible errors during downloading?
+				
+			}
+			return true;
+		}
+		
 	}
 	
 }
