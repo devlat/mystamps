@@ -17,8 +17,8 @@
  */
 package ru.mystamps.web.controller.interceptor;
 
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
@@ -28,7 +28,12 @@ import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 public class DownloadImageFromExternalResourceInterceptor extends HandlerInterceptorAdapter {
 	
 	@Override
-	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+	@SuppressWarnings("PMD.SignatureDeclareThrowsException")
+	public boolean preHandle(
+		HttpServletRequest request,
+		HttpServletResponse response,
+		Object handler) throws Exception {
+		
 		// TODO: use Url
 		// TODO: use .addPathPatterns() or .pathMatcher()
 		if ("POST".equals(request.getMethod()) && "/series/add".equals(request.getRequestURI())) {
