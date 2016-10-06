@@ -135,6 +135,8 @@ public class AddSeriesForm implements AddSeriesDto {
 	@ImageFile(groups = Image3Checks.class)
 	private MultipartFile image;
 	
+	// Name of this field must match with the field name that
+	// is being inspected by DownloadImageInterceptor
 	private String imageUrl;
 	
 	@GroupSequence({

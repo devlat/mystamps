@@ -17,15 +17,35 @@
  */
 package ru.mystamps.web.controller.interceptor;
 
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.StringUtils;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import org.springframework.util.FileCopyUtils;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.support.StandardMultipartHttpServletRequest;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
+
+import lombok.RequiredArgsConstructor;
 
 // TODO: read http://docs.spring.io/spring/docs/current/javadoc-api/org/springframework/web/servlet/HandlerInterceptor.html
 // TODO: read http://docs.spring.io/spring/docs/current/javadoc-api/org/springframework/web/context/request/WebRequestInterceptor.html
+// TODO: read about FileCopyUtils
 // TODO: javadoc
+// TODO: add togglz feature
 public class DownloadImageInterceptor extends HandlerInterceptorAdapter {
+	private static final Logger LOG = LoggerFactory.getLogger(DownloadImageInterceptor.class);
 	
 	@Override
 	@SuppressWarnings("PMD.SignatureDeclareThrowsException")
@@ -34,20 +54,105 @@ public class DownloadImageInterceptor extends HandlerInterceptorAdapter {
 		HttpServletResponse response,
 		Object handler) throws Exception {
 		
-		if ("POST".equals(request.getMethod())) {
-			System.out.println("DEBUG: preHandle date: " + new java.util.Date());
-			System.out.println("DEBUG: preHandle params: " + request.getParameterMap());
-			System.out.println("DEBUG: preHandle image = " + request.getParameter("image"));
-			System.out.println("DEBUG: preHandle imageUrl = " + request.getParameter("imageUrl"));
-			
-			// TODO: find attachment
-			// TODO: if attachment is empty and url is not empty => download image and fill attach
-			// TODO: if attachment is not empty and url is not empty => do nothing (validator will fail later)
-			// TODO: how we can validate url?
-			// TODO: where/how to show possible errors during downloading?
-			
+		if (!"POST".equals(request.getMethod())) {
+			return true;
 		}
+		
+		// Inspecting AddSeriesForm.imageUrl field.
+		// If it doesn't have a value, then nothing to do here.
+		String imageUrl = request.getParameter("imageUrl");
+		if (StringUtils.isEmpty(imageUrl)) {
+			return true;
+		}
+		
+		if (!(request instanceof StandardMultipartHttpServletRequest)) {
+			LOG.warn(
+				"Unknown type of request ({}). "
+				+ "Downloading images from external servers won't work!",
+				request
+			);
+			return true;
+		}
+		
+		LOG.debug("preHandle imageUrl = {}", request.getParameter("imageUrl"));
+		
+		StandardMultipartHttpServletRequest multipartRequest =
+			(StandardMultipartHttpServletRequest)request;
+		MultipartFile image = multipartRequest.getFile("image");
+		if (image != null && StringUtils.isNotEmpty(image.getOriginalFilename())) {
+			LOG.debug("User provided image, exited");
+			// user specified both image and image URL, we'll handle it later, during validation
+			return true;
+		}
+		
+		// user specified image URL: we should download file and represent it as "image" field.
+		// Doing this our validation will be able to check downloaded file later.
+		
+		LOG.debug("User provided link, downloading");
+		// TODO: change user agent
+		byte[] data = new byte[0];
+		try {
+			data = FileCopyUtils.copyToByteArray(new BufferedInputStream(new URL(imageUrl).openStream()));
+		} catch (IOException e) {
+			// TODO: log possible exceptions
+			// TODO: where/how to show possible errors during downloading?
+			e.printStackTrace();
+		}
+		LOG.debug("Downloaded!");
+		
+		multipartRequest.getMultiFileMap().set("image", new MyMultipartFile(data, imageUrl));
+		LOG.debug("Request updated");
+		
+		// TODO: how we can validate url?
+		
 		return true;
+	}
+	
+	@RequiredArgsConstructor
+	private class MyMultipartFile implements MultipartFile {
+		private final byte[] content;
+		private final String link;
+		
+		@Override
+		public String getName() {
+			throw new IllegalStateException("Not implemented");
+		}
+
+		@Override
+		public String getOriginalFilename() {
+			return link;
+		}
+
+		// TODO: preserve original content type
+		@Override
+		public String getContentType() {
+			return "image/jpeg";
+		}
+
+		@Override
+		public boolean isEmpty() {
+			return getSize() == 0;
+		}
+
+		@Override
+		public long getSize() {
+			return content.length;
+		}
+
+		@Override
+		public byte[] getBytes() throws IOException {
+			return content;
+		}
+
+		@Override
+		public InputStream getInputStream() throws IOException {
+			return new ByteArrayInputStream(content); // TODO: optimize
+		}
+
+		@Override
+		public void transferTo(File dest) throws IOException, IllegalStateException {
+			throw new IllegalStateException("Not implemented");
+		}
 	}
 	
 }
