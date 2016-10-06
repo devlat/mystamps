@@ -116,7 +116,10 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
 		interceptor.setParamName("lang");
 		
 		registry.addInterceptor(interceptor);
-		registry.addInterceptor(new DownloadImageFromExternalResourceInterceptor());
+		
+		// TODO: check add series with category/country
+		registry.addInterceptor(new DownloadImageFromExternalResourceInterceptor())
+			.addPathPatterns(Url.ADD_SERIES_PAGE);
 	}
 	
 	@Override

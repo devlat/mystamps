@@ -34,9 +34,7 @@ public class DownloadImageFromExternalResourceInterceptor extends HandlerInterce
 		HttpServletResponse response,
 		Object handler) throws Exception {
 		
-		// TODO: use Url
-		// TODO: use .addPathPatterns() or .pathMatcher()
-		if ("POST".equals(request.getMethod()) && "/series/add".equals(request.getRequestURI())) {
+		if ("POST".equals(request.getMethod())) {
 			System.out.println("DEBUG: preHandle date: " + new java.util.Date());
 			System.out.println("DEBUG: preHandle params: " + request.getParameterMap());
 			System.out.println("DEBUG: preHandle image = " + request.getParameter("image"));
