@@ -20,9 +20,14 @@ package ru.mystamps.web.controller.interceptor;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLConnection;
+import java.util.concurrent.TimeUnit;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -86,18 +91,105 @@ public class DownloadImageInterceptor extends HandlerInterceptorAdapter {
 		// Doing this our validation will be able to check downloaded file later.
 		
 		LOG.debug("User provided link, downloading");
-		// TODO: change user agent
+		// TODO: where/how to show possible errors during downloading?
 		byte[] data;
-		try (InputStream stream = new BufferedInputStream(new URL(imageUrl).openStream())) {
-			data = StreamUtils.copyToByteArray(stream);
-		} catch (IOException ex) {
+		try {
+			URL url = new URL(imageUrl);
+			LOG.debug("URL.getPath(): {}", url.getPath());
+			LOG.debug("URL.getFile(): {}", url.getFile());
+			
+			// TODO: add title to field that only HTTP protocol is supported and no redirects are allowed
+			if (!"http".equals(url.getProtocol())) {
+				// TODO(security): fix possible log injection
+				LOG.info("Invalid link '{}': only HTTP protocol is supported", imageUrl);
+				return true;
+			}
+			
+			try {
+				URLConnection connection = url.openConnection();
+				if (!(connection instanceof HttpURLConnection)) {
+					LOG.warn(
+						"Unknown type of connection class ({}). "
+						+ "Downloading images from external servers won't work!",
+						connection
+					);
+					return true;
+				}
+				HttpURLConnection conn = (HttpURLConnection)connection;
+				
+				conn.setRequestProperty(
+					"User-Agent",
+					"Mozilla/5.0 (X11; Fedora; Linux x86_64; rv:46.0) Gecko/20100101 Firefox/46.0"
+				);
+				
+				int timeout = TimeUnit.SECONDS.toMillis(1);
+				conn.setReadTimeout(timeout);
+				LOG.debug("getReadTimeout(): {}", conn.getReadTimeout());
+				
+				// TODO: how bad is it?
+				conn.setInstanceFollowRedirects(false);
+				
+				try {
+					conn.connect();
+				} catch (IOException ex) {
+					// TODO(security): fix possible log injection
+					LOG.error("Couldn't connect to '{}': {}", imageUrl, ex.getMessage());
+					return true;
+				}
+				
+				try (InputStream stream = new BufferedInputStream(conn.getInputStream())) {
+					int status = conn.getResponseCode();
+					if (status != HttpURLConnection.HTTP_OK) {
+						// TODO(security): fix possible log injection
+						LOG.error("Couldn't download file '{}': bad response status {}", imageUrl, status);
+						return true;
+					}
+					
+					// TODO: add protection against huge files
+					int contentLength = conn.getContentLength();
+					LOG.debug("Content-Length: {}", contentLength);
+					if (contentLength <= 0) {
+						// TODO(security): fix possible log injection
+						LOG.error("Couldn't download file '{}': it has {} bytes length", imageUrl, contentLength);
+						return true;
+					}
+					
+					String contentType = conn.getContentType();
+					LOG.debug("Content-Type: {}", contentType);
+					if (!"image/jpeg".equals(contentType) && !"image/png".equals(contentType)) {
+						// TODO(security): fix possible log injection
+						LOG.error("Couldn't download file '{}': unsupported image type '{}'", imageUrl, contentType);
+						return true;
+					}
+					
+					data = StreamUtils.copyToByteArray(stream);
+					
+				} catch (FileNotFoundException ignored) {
+					// TODO: show error to user
+					// TODO(security): fix possible log injection
+					LOG.error("Couldn't download file '{}': not found", imageUrl);
+					return true;
+					
+				} catch (IOException ex) {
+					// TODO(security): fix possible log injection
+					LOG.error("Couldn't download file from URL '{}': {}", imageUrl, ex.getMessage());
+					return true;
+				}
+		
+			} catch (IOException ex) {
+				LOG.error("Couldn't open connection: {}", ex.getMessage());
+				return true;
+			}
+			
+		} catch (MalformedURLException ex) {
 			// TODO(security): fix possible log injection
-			// TODO: where/how to show possible errors during downloading?
-			LOG.error("Couldn't download file from URL '" + imageUrl + "'", ex);
+			// TODO: show error to user
+			LOG.error("Invalid image URL '{}': {}", imageUrl, ex.getMessage());
 			return true;
 		}
 		LOG.debug("Downloaded!");
 		
+		// TODO: use URL.getFile() instead of full link?
 		multipartRequest.getMultiFileMap().set("image", new MyMultipartFile(data, imageUrl));
 		LOG.debug("Request updated");
 		

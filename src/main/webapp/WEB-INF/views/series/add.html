@@ -235,8 +235,8 @@
 									Image URL
 								</span>
 							</label>
-							<div class="col-sm-7">
-								<input type="url" id="image-url" th:field="*{imageUrl}" />
+							<div class="col-sm-5">
+								<input type="url" id="image-url" class="form-control" th:field="*{imageUrl}" />
 								<span id="image-url.errors" class="help-block" th:if="${#fields.hasErrors('imageUrl')}" th:each="error : ${#fields.errors('imageUrl')}" th:text="${error}"></span>
 							</div>
 						</div>
