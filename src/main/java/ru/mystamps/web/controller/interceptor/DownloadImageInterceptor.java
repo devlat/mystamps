@@ -32,16 +32,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.springframework.util.FileCopyUtils;
+import org.springframework.util.StreamUtils;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.support.StandardMultipartHttpServletRequest;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 import lombok.RequiredArgsConstructor;
 
-// TODO: read http://docs.spring.io/spring/docs/current/javadoc-api/org/springframework/web/servlet/HandlerInterceptor.html
-// TODO: read http://docs.spring.io/spring/docs/current/javadoc-api/org/springframework/web/context/request/WebRequestInterceptor.html
-// TODO: read about FileCopyUtils
 // TODO: javadoc
 // TODO: add togglz feature
 public class DownloadImageInterceptor extends HandlerInterceptorAdapter {
@@ -90,13 +87,14 @@ public class DownloadImageInterceptor extends HandlerInterceptorAdapter {
 		
 		LOG.debug("User provided link, downloading");
 		// TODO: change user agent
-		byte[] data = new byte[0];
-		try {
-			data = FileCopyUtils.copyToByteArray(new BufferedInputStream(new URL(imageUrl).openStream()));
-		} catch (IOException e) {
-			// TODO: log possible exceptions
+		byte[] data;
+		try (InputStream stream = new BufferedInputStream(new URL(imageUrl).openStream())) {
+			data = StreamUtils.copyToByteArray(stream);
+		} catch (IOException ex) {
+			// TODO(security): fix possible log injection
 			// TODO: where/how to show possible errors during downloading?
-			e.printStackTrace();
+			LOG.error("Couldn't download file from URL '" + imageUrl + "'", ex);
+			return true;
 		}
 		LOG.debug("Downloaded!");
 		
@@ -146,7 +144,7 @@ public class DownloadImageInterceptor extends HandlerInterceptorAdapter {
 
 		@Override
 		public InputStream getInputStream() throws IOException {
-			return new ByteArrayInputStream(content); // TODO: optimize
+			return new ByteArrayInputStream(content);
 		}
 
 		@Override
