@@ -122,8 +122,8 @@ public class DownloadImageInterceptor extends HandlerInterceptorAdapter {
 					"Mozilla/5.0 (X11; Fedora; Linux x86_64; rv:46.0) Gecko/20100101 Firefox/46.0"
 				);
 				
-				int timeout = TimeUnit.SECONDS.toMillis(1);
-				conn.setReadTimeout(timeout);
+				long timeout = TimeUnit.SECONDS.toMillis(1);
+				conn.setReadTimeout(Math.toIntExact(timeout));
 				LOG.debug("getReadTimeout(): {}", conn.getReadTimeout());
 				
 				// TODO: how bad is it?
