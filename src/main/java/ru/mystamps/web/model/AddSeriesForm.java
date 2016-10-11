@@ -26,6 +26,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import org.hibernate.validator.constraints.Range;
+import org.hibernate.validator.constraints.URL;
 
 import org.springframework.web.multipart.MultipartFile;
 
@@ -56,6 +57,9 @@ import static ru.mystamps.web.validation.ValidationRules.MIN_STAMPS_IN_SERIES;
 
 @Getter
 @Setter
+// TODO: image or imageUrl must be specified (but not both)
+// TODO: localize URL
+// TODO: disallow urls like http://test
 // TODO: combine price with currency to separate class
 @SuppressWarnings({"PMD.TooManyFields", "PMD.AvoidDuplicateLiterals"})
 @NotNullIfFirstField.List({
@@ -128,7 +132,7 @@ public class AddSeriesForm implements AddSeriesDto {
 	@Size(max = MAX_SERIES_COMMENT_LENGTH, message = "{value.too-long}")
 	private String comment;
 	
-	@NotNull
+//	@NotNull
 	@NotEmptyFilename(groups = Image1Checks.class)
 	@NotEmptyFile(groups = Image2Checks.class)
 	@MaxFileSize(value = MAX_IMAGE_SIZE, unit = Unit.Kbytes, groups = Image3Checks.class)
@@ -137,6 +141,7 @@ public class AddSeriesForm implements AddSeriesDto {
 	
 	// Name of this field must match with the field name that
 	// is being inspected by DownloadImageInterceptor
+	@URL(protocol = "http")
 	private String imageUrl;
 	
 	@GroupSequence({
