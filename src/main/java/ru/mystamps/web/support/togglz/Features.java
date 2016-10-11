@@ -70,7 +70,11 @@ public enum Features implements Feature {
 	
 	@Label("Show series purchases and sales on series info page")
 	@EnabledByDefault
-	PURCHASES_AND_SALES;
+	PURCHASES_AND_SALES,
+	
+	@Label("Possibility to download image from external server")
+	@EnabledByDefault
+	DOWNLOAD_IMAGE;
 	
 	public boolean isActive() {
 		return FeatureContext.getFeatureManager().isActive(this);

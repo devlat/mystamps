@@ -45,7 +45,6 @@ import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 import lombok.RequiredArgsConstructor;
 
 // TODO: javadoc
-// TODO: add togglz feature
 public class DownloadImageInterceptor extends HandlerInterceptorAdapter {
 	private static final Logger LOG = LoggerFactory.getLogger(DownloadImageInterceptor.class);
 	
