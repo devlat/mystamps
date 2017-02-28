@@ -78,6 +78,12 @@ public class FilesystemImagePersistenceStrategy implements ImagePersistenceStrat
 		return get(storageDir, image);
 	}
 	
+	@Override
+	public ImageDto getPreview(ImageInfoDto image) {
+		// TODO: implement
+		return null;
+	}
+	
 	// protected to allow spying
 	protected Path generateFilePath(File dir, ImageInfoDto image) {
 		return new File(dir, generateFileName(image)).toPath();
