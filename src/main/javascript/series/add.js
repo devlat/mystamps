@@ -5,7 +5,7 @@
 function initPage() {
 	$('#country').selectize();
 	
-	$('.js-catalog-numbers').on('blur', function() {
+	$('.js-catalog-numbers').on('blur', function processNumber() {
 		$(this).val(function(idx, val) {
 			return CatalogUtils.expandNumbers(val);
 		});
