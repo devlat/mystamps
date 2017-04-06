@@ -56,6 +56,9 @@ public enum Features implements Feature {
 	@EnabledByDefault
 	SHOW_PURCHASES_AND_SALES,
 	
+	@Label("/series/{id}: show images preview")
+	SHOW_IMAGES_PREVIEW,
+	
 	@Label("/series/{id}: possibility of user to add series purchases and sales")
 	@EnabledByDefault
 	ADD_PURCHASES_AND_SALES,

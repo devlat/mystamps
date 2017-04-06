@@ -110,8 +110,15 @@
 										<img class="img-responsive series-images"
 											id="series-image-1"
 											src="../../../../../test/resources/test.png"
+											togglz:inactive="SHOW_IMAGES_PREVIEW"
+											th:id="|series-image-${iter.count}|"
+											th:src="@{${GET_IMAGE_PAGE}(id=${imageId})}" />
+										<!--/*/
+										<img class="img-responsive series-images"
+											togglz:active="SHOW_IMAGES_PREVIEW"
 											th:id="|series-image-${iter.count}|"
 											th:src="@{${GET_IMAGE_PREVIEW_PAGE}(id=${imageId})}" />
+										/*/-->
 									</a>
 								</div>
 							</div>
