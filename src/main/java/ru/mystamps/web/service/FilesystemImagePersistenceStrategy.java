@@ -64,8 +64,11 @@ public class FilesystemImagePersistenceStrategy implements ImagePersistenceStrat
 		
 		LOG.info("Image previews will be saved into {} directory", previewDir);
 		
-		if (!previewDir.exists()) {
-			LOG.warn("Directory '{}' doesn't exist! Image preview generation won't work.", previewDir);
+		if (!previewDir.exists()) { // NOPMD: ConfusingTernary (it's ok for me)
+			LOG.warn(
+				"Directory '{}' doesn't exist! Image preview generation won't work.",
+				previewDir
+			);
 		
 		} else if (!previewDir.canWrite()) {
 			// TODO(java9): log also user: ProcessHandle.current().info().user()
